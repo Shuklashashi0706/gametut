@@ -11,11 +11,11 @@ const supabase = createClient(
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const publicKeyPath = path.join(__dirname, "../", "public_key.pem");
-const publicKey = fs.readFileSync(publicKeyPath, "utf8");
+// const publicKeyPath = path.join(__dirname, "../", "public_key.pem");
+// const publicKey = fs.readFileSync(publicKeyPath, "utf8");
 
 // function encryptDataWithPublicKey(data) {
 //   const buffer = Buffer.from(data.toString(), "utf8");
