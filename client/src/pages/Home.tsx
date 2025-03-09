@@ -16,7 +16,7 @@ interface HomeProps {
 }
 
 
-const API_URL = import.meta.env.VITE_BACKEND_URI;
+const API_URL = `${import.meta.env.VITE_BACKEND_URI}/api`;
 
 export function Home({ onPageChange }: HomeProps) {
   const { publicKey, disconnect } = useWallet();
