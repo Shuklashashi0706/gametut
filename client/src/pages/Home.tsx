@@ -15,7 +15,7 @@ interface HomeProps {
   onPageChange: (page: "home" | "profile") => void;
 }
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_BACKEND_URI;
 
 export function Home({ onPageChange }: HomeProps) {
   const { publicKey, disconnect } = useWallet();
