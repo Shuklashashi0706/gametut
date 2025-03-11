@@ -81,7 +81,7 @@ export function Home({ onPageChange }: HomeProps) {
 
       try {
         if (token && publicKey) {
-          const balanceResponse = await axios.get(`${API_URL}/user/profile`, {
+          const balanceResponse = await axios.get(`${API_URL}/api/user/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setBalance(balanceResponse.data.account_balance || 0);
@@ -89,7 +89,7 @@ export function Home({ onPageChange }: HomeProps) {
 
         // Fetch multipliers (default to "easy" on load)
         const multipliersResponse = await axios.get(
-          `${API_URL}/seeds/multipliers`,
+          `${API_URL}/api/seeds/multipliers`,
           {
             params: { difficulty: "easy" },
             headers: { Authorization: `Bearer ${token}` },
@@ -118,7 +118,7 @@ export function Home({ onPageChange }: HomeProps) {
           if (!authToken) {
             throw new Error("No auth token found");
           }
-          const response = await axios.get(`${API_URL}/seeds/multipliers`, {
+          const response = await axios.get(`${API_URL}/api/seeds/multipliers`, {
             params: { difficulty },
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -178,7 +178,7 @@ export function Home({ onPageChange }: HomeProps) {
 
       // 2) Immediately call /seeds/create with the new client seed
       const response = await axios.post(
-        `${API_URL}/seeds/create`,
+        `${API_URL}/api/seeds/create`,
         { clientSeed: newClientSeed, difficulty, betAmount: bet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -206,7 +206,7 @@ export function Home({ onPageChange }: HomeProps) {
     const token = localStorage.getItem("authToken");
     try {
       const response = await axios.post(
-        `${API_URL}/seeds/retire`,
+        `${API_URL}/api/seeds/retire`,
         { seedPairId, betAmount: parseFloat(betAmount), cashOutLane },
         { headers: { Authorization: `Bearer ${token}` } }
       );
