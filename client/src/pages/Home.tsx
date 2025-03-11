@@ -85,7 +85,7 @@ export function Home({ onPageChange }: HomeProps) {
       try {
         // If user is logged in & has a wallet
         if (token && publicKey) {
-          const balanceResponse = await axios.get(`${API_URL}/user/profile`, {
+          const balanceResponse = await axios.get(`${API_URL}/api/user/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           const userBal = balanceResponse.data.account_balance || 0;
@@ -94,7 +94,7 @@ export function Home({ onPageChange }: HomeProps) {
         }
 
         // Fetch all difficulties multipliers just once
-        const allResponse = await axios.get(`${API_URL}/seeds/multipliers`, {
+        const allResponse = await axios.get(`${API_URL}/api/seeds/multipliers`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         // shape of data => { easy: [...], medium: [...], hard: [...], daredevil: [...] }
