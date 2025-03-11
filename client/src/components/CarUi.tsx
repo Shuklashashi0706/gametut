@@ -9,8 +9,8 @@ interface CarUiProps {
   forceCrashCar?: boolean;
   crashLane?: number;
   // NEW CALLBACKS to notify GameUI:
-  onCrashPass?: () => void;       // Called when the crash car is “over” the cock
-  onCrashComplete?: () => void;   // Called when the crash car fully exits
+  onCrashPass?: () => void; // Called when the crash car is “over” the cock
+  onCrashComplete?: () => void; // Called when the crash car fully exits
 }
 
 interface CarType {
@@ -46,7 +46,6 @@ const CarUi: React.FC<CarUiProps> = ({
     daredevil: 500, // for example
   };
   const travelTime = speedMap[difficulty];
-
   // Keep track of whether we have already triggered "onCrashPass"
   const hasPassedRef = useRef(false);
 
@@ -65,14 +64,18 @@ const CarUi: React.FC<CarUiProps> = ({
     const spawnInterval = setInterval(() => {
       setCars((prevCars) => {
         // Choose a lane where the hen hasn’t already crossed and there’s no existing car
-        const availableLanes = Array.from({ length: lanesCount }, (_, i) => i + 1).filter(
+        const availableLanes = Array.from(
+          { length: lanesCount },
+          (_, i) => i + 1
+        ).filter(
           (lane) =>
             !crossedLanes.current.includes(lane) &&
             !prevCars.some((car) => car.lane === lane && !car.isCrashCar)
         );
         if (availableLanes.length === 0) return prevCars;
 
-        const lane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+        const lane =
+          availableLanes[Math.floor(Math.random() * availableLanes.length)];
         const images = [Car1Img, Car2Img];
         const image = images[Math.floor(Math.random() * images.length)];
 
@@ -120,9 +123,7 @@ const CarUi: React.FC<CarUiProps> = ({
       // Animate it downward
       setTimeout(() => {
         setCars((currentCars) =>
-          currentCars.map((car) =>
-            car.id === id ? { ...car, top: 120 } : car
-          )
+          currentCars.map((car) => (car.id === id ? { ...car, top: 120 } : car))
         );
       }, 50);
 
@@ -160,11 +161,11 @@ const CarUi: React.FC<CarUiProps> = ({
   }, [cars, crashCarId, onCrashPass, onCrashComplete]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden z-10">
+    <div className="relative w-full h-full overflow-hidden z-30">
       {cars.map((car) => (
         <div
           key={car.id}
-          className="absolute transition-all ease-linear z-10"
+          className="absolute transition-all ease-linear z-30"
           style={{
             top: `${car.top}%`,
             left: `${(car.lane - 1) * roadWidth}px`,
