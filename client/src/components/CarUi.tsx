@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import Car1Img from "../assets/car_1.svg";
 import Car2Img from "../assets/car_2.svg";
+import Car3Img from "../assets/car_3.svg";
+import Car4Img from "../assets/car_4.svg";
+import Car5Img from "../assets/car_5.svg";
 
 interface CarUiProps {
   difficulty: "easy" | "medium" | "hard" | "daredevil";
@@ -8,17 +11,17 @@ interface CarUiProps {
   roadWidth: number;
   forceCrashCar?: boolean;
   crashLane?: number;
-  onCrashPass?: () => void;      // when the crash car passes over the cock
-  onCrashComplete?: () => void;  // when the crash car exits fully
+  onCrashPass?: () => void; // when the crash car passes over the cock
+  onCrashComplete?: () => void; // when the crash car exits fully
 }
 
 interface CarType {
   id: number;
   lane: number;
   image: string;
-  top: number;         // from -50% to 120%
+  top: number; // from -50% to 120%
   isCrashCar?: boolean;
-  travelTime: number;  // each car's unique speed
+  travelTime: number; // each car's unique speed
 }
 
 // Lane count
@@ -79,7 +82,10 @@ const CarUi: React.FC<CarUiProps> = ({
         const speed = speedMap[spawnDifficulty]; // normal speed for random cars
 
         // pick a lane
-        const availableLanes = Array.from({ length: laneCount }, (_, i) => i + 1).filter(
+        const availableLanes = Array.from(
+          { length: laneCount },
+          (_, i) => i + 1
+        ).filter(
           (lane) =>
             // skip lanes the hen has already crossed
             !crossedLanesRef.current.includes(lane) &&
@@ -88,8 +94,9 @@ const CarUi: React.FC<CarUiProps> = ({
         );
         if (availableLanes.length === 0) return prevCars;
 
-        const lane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
-        const images = [Car1Img, Car2Img];
+        const lane =
+          availableLanes[Math.floor(Math.random() * availableLanes.length)];
+        const images = [Car1Img, Car2Img, Car3Img, Car4Img, Car5Img];
         const image = images[Math.floor(Math.random() * images.length)];
 
         const id = nextId.current++;
@@ -97,8 +104,8 @@ const CarUi: React.FC<CarUiProps> = ({
           id,
           lane,
           image,
-          top: -50,
-          travelTime: speed,   // normal difficulty-based speed
+          top: -40,
+          travelTime: speed, // normal difficulty-based speed
         };
 
         // Animate it downward
@@ -132,10 +139,10 @@ const CarUi: React.FC<CarUiProps> = ({
       const newCar: CarType = {
         id,
         lane: crashLane,
-        image: Car1Img, 
+        image: Car1Img,
         top: -50,
         isCrashCar: true,
-        travelTime: FORCED_CRASH_CAR_SPEED,  // <-- override normal difficulty speed
+        travelTime: FORCED_CRASH_CAR_SPEED, // <-- override normal difficulty speed
       };
 
       setCars((prev) => [...prev, newCar]);
