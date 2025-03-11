@@ -170,7 +170,7 @@ export function Home({ onPageChange }: HomeProps) {
 
       // Call /seeds/create
       const response = await axios.post(
-        `${API_URL}/seeds/create`,
+        `${API_URL}/api/seeds/create`,
         { clientSeed: newClientSeed, difficulty, betAmount: bet },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -200,7 +200,7 @@ export function Home({ onPageChange }: HomeProps) {
     const token = localStorage.getItem("authToken");
     try {
       const response = await axios.post(
-        `${API_URL}/seeds/retire`,
+        `${API_URL}/api/seeds/retire`,
         { seedPairId, betAmount: parseFloat(betAmount), cashOutLane },
         { headers: { Authorization: `Bearer ${token}` } }
       );
