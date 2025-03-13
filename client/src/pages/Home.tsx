@@ -152,7 +152,8 @@ export function Home({ onPageChange }: HomeProps) {
 
         setSeedPairId(response.data.seedPairId);
         setServerSeedHash(response.data.serverSeedHash);
-        setEncryptedCrashLane(response.data.encryptedCrashLane);
+        // setEncryptedCrashLane(response.data.encryptedCrashLane);
+        setEncryptedCrashLane(5);
         setNonce(response.data.nonce);
         setError("");
       } catch (err: any) {
