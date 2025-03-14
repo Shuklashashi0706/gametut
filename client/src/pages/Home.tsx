@@ -233,10 +233,10 @@ export function Home({ onPageChange }: HomeProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1923] text-white">
+    <div className="min-h-screen flex flex-col bg-black text-white">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 bg-[#1A2C38]/95 backdrop-blur-lg border-b border-white/10 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="  bg-[#1A2C38]/95 backdrop-blur-lg border-b border-white/10 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-5 lg:py-3 ">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
               Chicken Cross
@@ -311,17 +311,17 @@ export function Home({ onPageChange }: HomeProps) {
       </div>
 
       {/* Main content */}
-      <div className="pt-20 pb-12 px-4">
-        <div className="max-w-7xl mx-auto">
+      <div className="  lg:pt-10 ">
+        <div className=" max-w-[85rem] mx-auto min-h-[40rem] bg-[#191939] lg:p-5 lg:rounded-2xl  ">
           {initialLoading ? (
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-              <p className="mt-2 text-gray-400">Loading initial data...</p>
+            <div className="  w-full min-h-[40rem] flex justify-center items-center ">
+              <div className=" animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+              {/* <p className="mt-2 text-gray-400">Loading initial data...</p> */}
             </div>
           ) : (
             <>
               {/* The actual game UI */}
-              <div className="border border-white rounded-2xl overflow-x-auto">
+              <div className="lg:rounded-xl overflow-x-auto">
                 <GameUI
                   betAmount={parseFloat(betAmount)}
                   difficulty={difficulty}
@@ -335,7 +335,31 @@ export function Home({ onPageChange }: HomeProps) {
               </div>
 
               {/* Bet & Difficulty */}
-              <div className="mb-6 bg-[#1A2C38] rounded-2xl p-6 backdrop-blur-lg border border-white/10">
+              <div className="mt-5 bg-[#1A2C38]  rounded-2xl p-6 backdrop-blur-lg  border-white/10">
+              <div className="lg:hidden  mt-2">
+                  <div className="text-center mb-2">
+                    <span className="text-sm text-purple-300 bg-purple-500/20 px-3 py-1 rounded-full">
+                      Betting 0 SOL enters demo mode
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleStartGame}
+                    disabled={gameActive || isCreating}
+                    className={`w-full font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-[1.02]
+                      ${
+                        gameActive || isCreating
+                          ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                          : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black"
+                      }`}
+                  >
+                    {isCreating ? "Start Game" : "Start Game"}
+                  </button>
+                  <p className="text-center text-sm text-gray-400 mt-2">
+                    {parseFloat(betAmount) === 0
+                      ? "Demo Mode"
+                      : `Playing on ${difficulty} mode`}
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {/* Bet */}
                   <div className="space-y-2">
@@ -427,30 +451,7 @@ export function Home({ onPageChange }: HomeProps) {
                   </div>
                 </div>
                 {/* Mobile Start Button */}
-                <div className="lg:hidden mt-6">
-                  <div className="text-center mb-2">
-                    <span className="text-sm text-purple-300 bg-purple-500/20 px-3 py-1 rounded-full">
-                      Betting 0 SOL enters demo mode
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleStartGame}
-                    disabled={gameActive || isCreating}
-                    className={`w-full font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-[1.02]
-                      ${
-                        gameActive || isCreating
-                          ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                          : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black"
-                      }`}
-                  >
-                    {isCreating ? "Start Game" : "Start Game"}
-                  </button>
-                  <p className="text-center text-sm text-gray-400 mt-2">
-                    {parseFloat(betAmount) === 0
-                      ? "Demo Mode"
-                      : `Playing on ${difficulty} mode`}
-                  </p>
-                </div>
+              
                 {error && (
                   <p className="text-red-400 text-center mt-4">{error}</p>
                 )}

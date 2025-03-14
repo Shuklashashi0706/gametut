@@ -75,13 +75,14 @@ async function determineCrashLane(outcome, difficulty) {
     daredevil: 5,
   };
   const laneCount = laneCounts[difficulty] || 6;
-
   const baseWeights = {
-    easy: [0.3, 0.25, 0.2, 0.15, 0.05, 0.05],
-    medium: [0.35, 0.25, 0.2, 0.1, 0.05, 0.05],
-    hard: [0.4, 0.25, 0.15, 0.1, 0.05, 0.05],
-    daredevil: [0.5, 0.25, 0.15, 0.05, 0.05],
+    easy: [0.25, 0.2, 0.15, 0.1, 0.08, 0.07, 0.05, 0.05, 0.025, 0.025],
+    medium: [0.3, 0.22, 0.15, 0.1, 0.08, 0.05, 0.04, 0.03, 0.02, 0.01],
+    hard: [0.3, 0.2, 0.15, 0.1, 0.075, 0.05, 0.05, 0.05, 0.025, 0.025],
+    daredevil: [0.45, 0.2, 0.1, 0.05, 0.05, 0.05, 0.025, 0.025, 0.025, 0.025]
   };
+  
+  
   let weights = baseWeights[difficulty] || baseWeights.easy;
 
   const profitLossRatio = await getHouseProfitLossRatio();
@@ -103,11 +104,12 @@ async function determineCrashLane(outcome, difficulty) {
 
 async function getMultipliers(difficulty) {
   const baseMultipliers = {
-    easy: [1.0, 1.02, 1.05, 1.08, 1.12, 1.15],
-    medium: [1.05, 1.15, 1.3, 1.5, 1.75, 2.0],
-    hard: [1.1, 1.25, 1.5, 1.8, 2.2, 2.7],
-    daredevil: [1.2, 1.5, 2.0, 2.8, 4.0],
+    easy: [1.0, 1.02, 1.05, 1.08, 1.12, 1.15, 1.18, 1.22, 1.26, 1.3],
+    medium: [1.05, 1.15, 1.3, 1.5, 1.75, 2.0, 2.3, 2.6, 3.0, 3.5],
+    hard: [1.1, 1.25, 1.5, 1.8, 2.2, 2.7, 3.3, 4.0, 4.8, 5.7],
+    daredevil: [1.2, 1.5, 2.0, 2.8, 4.0, 5.5, 7.5, 10.0, 13.0, 17.0]
   };
+  
   let multipliers = baseMultipliers[difficulty] || baseMultipliers.easy;
 
   const profitLossRatio = await getHouseProfitLossRatio();

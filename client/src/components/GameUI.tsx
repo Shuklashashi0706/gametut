@@ -116,7 +116,7 @@ const GameUI: React.FC<GameUIProps> = ({
   };
 
   return (
-    <div className="lg:m-5 h-[20rem] lg:h-[25rem] w-fit relative">
+    <div className="  h-[20rem] lg:h-[25rem] w-fit relative">
       <div className="h-full flex relative">
         {/* Left BG */}
         <div
@@ -132,7 +132,7 @@ const GameUI: React.FC<GameUIProps> = ({
         {/* Road lanes */}
         <div
           ref={lanesContainerRef}
-          className="flex h-full  overflow-x-auto lanes-container "
+          className="flex h-full  overflow-x-auto lanes-container  "
         >
           {multipliers.map((value, index) => (
             <RoadUI
@@ -140,6 +140,7 @@ const GameUI: React.FC<GameUIProps> = ({
               gameActive={gameActive}
               laneIndex={index + 1}
               value={value}
+              multipliers={multipliers}
               currentLane={currentLane}
               onLaneClick={handleLaneClick}
               hideWall={crashLane === index + 1}
