@@ -5,14 +5,16 @@ import axios from "axios";
 import nacl from "tweetnacl";
 import GameUI from "../components/GameUI";
 import GameHistory from "../components/GameHistory";
+import refreshTime from "../utils/constants";
 
 interface HomeProps {
   onPageChange: (page: "home" | "profile") => void;
+  navigateToProfileWithModal: any;
 }
 
 const API_URL = import.meta.env.VITE_BACKEND_URI;
 
-export function Home({ onPageChange }: HomeProps) {
+export function Home({ onPageChange, navigateToProfileWithModal }: HomeProps) {
   const { publicKey, disconnect } = useWallet();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +60,18 @@ export function Home({ onPageChange }: HomeProps) {
   // Track if /create is in-flight
   const [isCreating, setIsCreating] = useState(false);
   const [cashOutLane, setCashOutLane] = useState<number>(0);
-  const [ifCashOut, setIfCashOut] = useState({ ifCashOut: false, cashOutLane: 0, crashLane: 0 });
+  const [ifCashOut, setIfCashOut] = useState({
+    ifCashOut: false,
+    cashOutLane: 0,
+    crashLane: 0,
+  });
+  const setMultipliersMethod = (allMultipliers: any, difficulty: string) => {
+    if (parseFloat(betAmount) > 0) {
+      setMultipliers(allMultipliers["original"][difficulty])
+    } else {
+      setMultipliers(allMultipliers["demo"][difficulty])
+    }
+  }
 
   // NEW: We define a buttonState with 4 possible states
   // "start_default" | "start_loading" | "cashout_disabled" | "cashout_enabled"
@@ -90,7 +103,7 @@ export function Home({ onPageChange }: HomeProps) {
           }
         );
         setAllMultipliers(allResponse.data);
-        setMultipliers(allResponse.data[difficulty]);
+        setMultipliersMethod(allResponse.data, difficulty);
       } catch (err: any) {
         setError(
           "Failed to load data: " + (err.response?.data?.error || err.message)
@@ -105,7 +118,7 @@ export function Home({ onPageChange }: HomeProps) {
   // 2) If difficulty changes & no active game, switch multipliers
   useEffect(() => {
     if (!gameActive && allMultipliers) {
-      setMultipliers(allMultipliers[difficulty]);
+      setMultipliersMethod(allMultipliers, difficulty)
     }
   }, [difficulty, allMultipliers, gameActive]);
 
@@ -123,6 +136,7 @@ export function Home({ onPageChange }: HomeProps) {
     }
     if (balance !== null && bet > balance) {
       setError("Insufficient balance.");
+      setButtonState("start_loading")
       return;
     }
 
@@ -131,7 +145,7 @@ export function Home({ onPageChange }: HomeProps) {
       try {
         if (!gameActive) {
           setIsCreating(true);
-          // While we are in flight => buttonState => "start_loading"      
+          // While we are in flight => buttonState => "start_loading"
           setButtonState("start_loading");
           const randomBytes = new Uint8Array(16);
           window.crypto.getRandomValues(randomBytes);
@@ -145,14 +159,14 @@ export function Home({ onPageChange }: HomeProps) {
 
           const response = await axios.post(
             `${API_URL}/api/seeds/create`,
-            { clientSeed: newClientSeed, difficulty, betAmount: bet },
+            { clientSeed: newClientSeed, difficulty, betAmount: bet, isGameActive: gameActive },
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
           setSeedPairId(response.data.seedPairId);
           setServerSeedHash(response.data.serverSeedHash);
           setEncryptedCrashLane(response.data.encryptedCrashLane);
-          // setEncryptedCrashLane(1);
+          // setEncryptedCrashLane(4);
           setNonce(response.data.nonce);
           setError("");
 
@@ -175,24 +189,29 @@ export function Home({ onPageChange }: HomeProps) {
   }, [betAmount, difficulty, publicKey, balance]);
 
   const handleCashOut = (cashOutLane: number) => {
-    setCashOutLane(cashOutLane)
-  }
+    setCashOutLane(cashOutLane);
+  };
   const handleStartGame = async () => {
     if (buttonState === "cashout_enabled") {
       const token = localStorage.getItem("authToken");
       if (encryptedCrashLane)
-        setIfCashOut({ ifCashOut: true, cashOutLane: cashOutLane, crashLane: encryptedCrashLane })
-      setButtonState("cashout_disabled")
-      setGameActive(false)
+        setIfCashOut({
+          ifCashOut: true,
+          cashOutLane: cashOutLane,
+          crashLane: encryptedCrashLane,
+        });
+      setButtonState("cashout_disabled");
+      setGameActive(false);
       const response = await axios.post(
         `${API_URL}/api/seeds/retire`,
         { seedPairId, betAmount: parseFloat(betAmount), cashOutLane },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response) {
-        setTimeout(() => window.location.reload(), 2000);
+        setTimeout(() => window.location.reload(), refreshTime);
       }
     } else {
+      setButtonState("cashout_disabled");
       if (!seedPairId) {
         setError("No seed pair available. Please adjust bet/difficulty first.");
         return;
@@ -208,7 +227,7 @@ export function Home({ onPageChange }: HomeProps) {
       }
       setGameActive(true);
       setError("");
-      setButtonState("cashout_disabled");
+
     }
   };
 
@@ -224,13 +243,12 @@ export function Home({ onPageChange }: HomeProps) {
       if (parseFloat(betAmount) > 0) {
         const response = await axios.post(
           `${API_URL}/api/seeds/retire`,
-          { seedPairId, betAmount: parseFloat(betAmount), cashOutLane },
+          { seedPairId, betAmount: parseFloat(betAmount), cashOutLane, difficulty },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (response)
-          setTimeout(() => window.location.reload(), 3000);
+        if (response) setTimeout(() => window.location.reload(), refreshTime);
       } else {
-        setTimeout(() => window.location.reload(), 3000);
+        setTimeout(() => window.location.reload(), refreshTime);
       }
     } catch (err: any) {
       setError(
@@ -263,9 +281,9 @@ export function Home({ onPageChange }: HomeProps) {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (response) {
-      setTimeout(() => window.location.reload(), 3000)
+      setTimeout(() => window.location.reload(), refreshTime);
     }
-  }
+  };
   // NEW: callback from GameUI => once lane #1 is clicked, switch to "cashout_enabled"
   const handleFirstLaneClick = () => {
     if (buttonState === "cashout_disabled") {
@@ -294,7 +312,10 @@ export function Home({ onPageChange }: HomeProps) {
                   <ChevronDown className="w-4 h-4 text-gray-400" />
                 </div>
               </div>
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-4 py-2 rounded-lg transition-colors flex items-center space-x-1">
+              <button
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-4 py-2 rounded-lg transition-colors flex items-center space-x-1"
+                onClick={navigateToProfileWithModal}
+              >
                 <Plus className="w-4 h-4" />
                 <span>Deposit</span>
               </button>
@@ -304,7 +325,9 @@ export function Home({ onPageChange }: HomeProps) {
                 <div className="flex items-center space-x-1">
                   <Wallet className="w-4 h-4 text-yellow-400" />
                   <span className="font-medium text-sm">
-                    {balance !== null ? `${balance.toFixed(3)} SOL` : "Loading..."}
+                    {balance !== null
+                      ? `${balance.toFixed(3)} SOL`
+                      : "Loading..."}
                   </span>
                 </div>
               </div>
@@ -383,9 +406,10 @@ export function Home({ onPageChange }: HomeProps) {
                 {/* MOBILE Start Button */}
                 <div className="lg:hidden  mt-2">
                   <div className="text-center mb-2">
-                    <span className="text-sm text-white bg-purple-500/20 px-3 py-1 rounded-full">
-                      Betting 0 SOL enters demo mode
-                    </span>
+                    {!gameActive &&
+                      <span className="text-sm text-white bg-purple-500/20 px-3 py-1 rounded-full">
+                        Betting 0 SOL enters demo mode
+                      </span>}
                   </div>
                   <button
                     onClick={handleStartGame}
@@ -419,7 +443,7 @@ export function Home({ onPageChange }: HomeProps) {
                         placeholder="Enter bet amount (0 for demo)"
                         disabled={gameActive}
                       />
-                      <div className="absolute right-2 top-2 flex space-x-1">
+                      {/* <div className="absolute right-2 top-2 flex space-x-1">
                         <button
                           onClick={() => handleQuickBet(0.5)}
                           className="px-2 py-1 text-xs bg-white/5 hover:bg-white/10 rounded"
@@ -438,7 +462,7 @@ export function Home({ onPageChange }: HomeProps) {
                         >
                           Clear
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
@@ -467,12 +491,16 @@ export function Home({ onPageChange }: HomeProps) {
                   </div>
 
                   {/* DESKTOP Start/CashOut Button */}
-                  <div className="hidden lg:flex flex-col justify-center">
-                    <div className="text-center mb-2">
-                      <span className="text-sm text-white bg-purple-500/20 px-3 py-1 rounded-full">
+                  <div className="hidden lg:flex flex-col justify-center ">
+                    <div className="text-center mb-2" style={{ minHeight: "1.75rem" }}>
+                      <span
+                        className={`text-sm text-white bg-purple-500/20 px-3 py-1 rounded-full transition-opacity duration-300 ${!gameActive ? "opacity-100 visible" : "opacity-0 invisible"
+                          }`}
+                      >
                         Betting 0 SOL enters demo mode
                       </span>
                     </div>
+
                     <button
                       onClick={handleStartGame}
                       disabled={
@@ -483,12 +511,14 @@ export function Home({ onPageChange }: HomeProps) {
                     >
                       {getButtonText(buttonState)}
                     </button>
+
                     <p className="text-center text-sm text-gray-400 mt-2">
                       {parseFloat(betAmount) === 0
                         ? "Demo Mode"
                         : `Playing on ${difficulty} mode`}
                     </p>
                   </div>
+
                 </div>
 
                 {error && (
